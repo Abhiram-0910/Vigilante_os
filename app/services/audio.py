@@ -1,9 +1,11 @@
 import os
 import base64
 import tempfile
+import uuid
 from groq import Groq
 from dotenv import load_dotenv
 from typing import Tuple
+from app.services.voice_out import generate_adversarial_voice
 
 # Graceful biometric fallback
 try:
@@ -115,4 +117,20 @@ def generate_adversarial_bait(type: str = "static") -> str:
     """
     Generates 'adversarial' audio to frustrate scammers.
     """
-    return "bait.mp3"
+    # Use static directory for caching
+    static_dir = os.path.join(os.getcwd(), "static")
+    os.makedirs(static_dir, exist_ok=True)
+    bait_path = os.path.join(static_dir, "bait.mp3")
+
+    # If exists, return path
+    if os.path.exists(bait_path):
+        return bait_path
+    
+    # Otherwise generate it
+    print("Generating new adversarial bait...")
+    try:
+        # Confused elderly static + stammer
+        text = "Hello? Can you hear me? My connection is... hello? Wait beta..."
+        return generate_adversarial_voice(text, output_path=bait_path)
+    except:
+        return None

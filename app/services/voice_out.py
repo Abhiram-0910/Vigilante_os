@@ -1,13 +1,22 @@
 import os
 import io
+import uuid
 from gtts import gTTS
 
-def generate_adversarial_voice(text: str, output_path: str = "reply.mp3"):
+# Ensure static directory exists
+STATIC_DIR = os.path.join(os.getcwd(), "static")
+os.makedirs(STATIC_DIR, exist_ok=True)
+
+def generate_adversarial_voice(text: str, output_path: str = None):
     """
     Generates a voice reply using Google Text-to-Speech (Free, no API key required).
     Adds a slight 'confusion' delay to simulate an elderly person.
     """
     try:
+        # Use unique filename if not provided
+        if not output_path:
+            output_path = os.path.join(STATIC_DIR, f"reply_{uuid.uuid4().hex[:8]}.mp3")
+        
         # Generate speech (Indian English accent 'co.in' if available, else default)
         tts = gTTS(text=text, lang='en', tld='co.in', slow=True)
         tts.save(output_path)
