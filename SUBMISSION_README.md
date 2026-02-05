@@ -84,7 +84,9 @@ Project VIBHISHAN is not just an AI bot; it is a **State-of-the-Art Agentic Defe
 ---
 
 ## 🛠️ Deployment & Handover
-1. **API Key**: Ensure `X-API-KEY` is set in headers (default: `vigilante_secret_key_123`).
+For detailed cloud deployment instructions (Render/Railway), see [DEPLOY.md](DEPLOY.md).
+
+1. **API Key**: Ensure `X-API-KEY` is set in headers (default: `gov_secure_access_2026`).
 2. **Stable Endpoint**: The server runs on `0.0.0.0:8000` and is ready for public tunnel exposure (e.g., ngrok/Cloudflare).
 3. **Rigorous Data**: Every response extracted is compared against the **Real-Time Intelligence Hub**, ensuring no "fake" data is returned.
 

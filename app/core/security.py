@@ -11,6 +11,8 @@ class InvalidAPIKeyError(Exception):
 
 
 async def get_api_key(api_key: str = Security(api_key_header)):
+    print(f"DEBUG: Received API Key: '{api_key}'")
+    print(f"DEBUG: Expected API Key: '{SETTINGS.VIBHISHAN_API_KEY}'")
     if not api_key or api_key != SETTINGS.VIBHISHAN_API_KEY:
         raise InvalidAPIKeyError()
     return api_key

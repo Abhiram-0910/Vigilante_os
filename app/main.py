@@ -179,12 +179,14 @@ def sanitize_agent_reply(text: str) -> str:
 def normalize_extracted(
     upi_ids: list,
     bank_accounts: list,
+    ifsc_codes: list,
     phone_numbers: list,
     urls: list,
 ) -> tuple:
     """Judge-friendly normalization: lowercase UPI, +91 phones, http(s) URLs."""
     upis = [str(u).lower().strip().replace(" ", "") for u in (upi_ids or []) if u]
     banks = [str(b).strip().replace(" ", "") for b in (bank_accounts or []) if b]
+    ifscs = [str(i).strip().upper() for i in (ifsc_codes or []) if i]
     phones = []
     for p in (phone_numbers or []):
         if not p:
@@ -202,11 +204,12 @@ def normalize_extracted(
         if u and not u.startswith(("http://", "https://")):
             u = "https://" + u
         urls_out.append(u)
-    return (upis, banks, phones, urls_out)
+    return (upis, banks, ifscs, phones, urls_out)
 
 def validate_extracted_format(
     upi_ids: list,
     bank_accounts: list,
+    ifsc_codes: list,
     phone_numbers: list,
     urls: list,
 ) -> tuple:
@@ -214,10 +217,11 @@ def validate_extracted_format(
     upi_ok = re.compile(r"^[a-z0-9.\-_]{2,256}@[a-z0-9.\-]{2,64}$").match
     upis = [u for u in (upi_ids or []) if u and upi_ok(str(u).lower().strip())]
     banks = [b for b in (bank_accounts or []) if b and re.match(r"^\d{9,18}$", re.sub(r"\D", "", str(b)))]
+    ifscs = [i for i in (ifsc_codes or []) if i and re.match(r"^[A-Z]{4}0[A-Z0-9]{6}$", str(i).strip())]
     phones = [p for p in (phone_numbers or []) if p and re.match(r"^\+91[6-9]\d{9}$", str(p).strip())]
     url_ok = re.compile(r"^https?://\S+$").match
     urls_out = [u for u in (urls or []) if u and url_ok(str(u).strip())]
-    return (upis, banks, phones, urls_out)
+    return (upis, banks, ifscs, phones, urls_out)
 
 def safe_fallback_response(
     session_id: str = "unknown",
@@ -228,6 +232,7 @@ def safe_fallback_response(
     engagement_duration_seconds: float = 0.0,
     upi_ids: list = None,
     bank_accounts: list = None,
+    ifsc_codes: list = None,
     phone_numbers: list = None,
     urls: list = None,
 ) -> JudgeResponse:
@@ -240,6 +245,7 @@ def safe_fallback_response(
         extracted_intelligence=JudgeExtractedIntelligence(
             upi_ids=upi_ids if upi_ids is not None else [],
             bank_accounts=bank_accounts if bank_accounts is not None else [],
+            ifsc_codes=ifsc_codes if ifsc_codes is not None else [],
             phone_numbers=phone_numbers if phone_numbers is not None else [],
             urls=urls if urls is not None else [],
         ),
@@ -266,6 +272,7 @@ def safe_competition_response(
 def to_competition_intelligence(
     upi_ids: list,
     bank_accounts: list,
+    ifsc_codes: list,
     urls: list,
     base_confidence: float,
 ) -> list:
@@ -290,6 +297,15 @@ def to_competition_intelligence(
                     type="BANK_ACCOUNT",
                     value=str(b),
                     confidence=max(0.65, min(1.0, conf * 0.95)),
+                )
+            )
+    for i in (ifsc_codes or []):
+        if i:
+            out.append(
+                CompetitionExtractedIntelligenceItem(
+                    type="IFSC_CODE",
+                    value=str(i),
+                    confidence=max(0.80, min(1.0, conf * 0.95)),
                 )
             )
     for url in (urls or []):
@@ -474,6 +490,7 @@ async def _analyze_internal(
             {
                 "upi_ids": raw_intel.get("upi_ids", []) if isinstance(raw_intel, dict) else [],
                 "bank_accounts": raw_intel.get("bank_accounts", []) if isinstance(raw_intel, dict) else [],
+                "ifsc_codes": raw_intel.get("ifsc_codes", []) if isinstance(raw_intel, dict) else [],
                 "phone_numbers": raw_intel.get("phone_numbers", []) if isinstance(raw_intel, dict) else [],
                 "urls": raw_intel.get("urls", []) if isinstance(raw_intel, dict) else [],
             },
@@ -491,13 +508,14 @@ async def _analyze_internal(
         if confidence < 0.3:
             agent_reply = "I'm not sure I understand. Can you explain?"
 
-        upis, banks, phones, urls_out = normalize_extracted(
+        upis, banks, ifscs, phones, urls_out = normalize_extracted(
             verified.get("upi_ids", []),
             verified.get("bank_accounts", []),
+            verified.get("ifsc_codes", []),
             verified.get("phone_numbers", []),
             verified.get("urls", []),
         )
-        upis, banks, phones, urls_out = validate_extracted_format(upis, banks, phones, urls_out)
+        upis, banks, ifscs, phones, urls_out = validate_extracted_format(upis, banks, ifscs, phones, urls_out)
 
         return {
             "session_id": session_id,
@@ -508,6 +526,7 @@ async def _analyze_internal(
             "agent_reply": agent_reply,
             "upis": upis,
             "banks": banks,
+            "ifscs": ifscs,
             "phones": phones,
             "urls": urls_out,
         }
@@ -611,6 +630,7 @@ async def analyze_message(
             intel_items = to_competition_intelligence(
                 result.get("upis"),
                 result.get("banks"),
+                result.get("ifscs"),
                 result.get("urls"),
                 result.get("confidence", 0.0),
             )
@@ -629,6 +649,7 @@ async def analyze_message(
             engagement_duration_seconds=float(result.get("duration", 0.0)),
             upi_ids=result.get("upis") or [],
             bank_accounts=result.get("banks") or [],
+            ifsc_codes=result.get("ifscs") or [],
             phone_numbers=result.get("phones") or [],
             urls=result.get("urls") or [],
         )

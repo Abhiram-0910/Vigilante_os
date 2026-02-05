@@ -35,56 +35,7 @@ from app.services.psych_profiler import psych_engine
 from app.services.intelligence_hub import intelligence_hub
 
 
-# ─── DUAL-BRAIN ORCHESTRATION (With Failover) ────────────────────────────────────
-from langchain_google_genai import ChatGoogleGenerativeAI
-
-class DualBrainLLM(Runnable):
-    def __init__(self, primary_model: str, fallback_model: str, temperature: float = 0.7):
-        self.primary = ChatGroq(
-            temperature=temperature,
-            model_name=primary_model,
-            api_key=SETTINGS.GROQ_API_KEY
-        )
-        self.fallback = ChatGoogleGenerativeAI(
-            model=fallback_model,
-            google_api_key=SETTINGS.GEMINI_API_KEY,
-            temperature=temperature
-        )
-
-    def __or__(self, other):
-        # Explicit piping support for LCEL
-        return RunnableLambda(self.ainvoke) | other
-
-    def pipe(self, other):
-        return self.__or__(other)
-
-    async def ainvoke(self, input: Any, config: Any = None, **kwargs) -> Any:
-        try:
-            # We must pass positional argument carefully for LCEL compatibility
-            return await self.primary.ainvoke(input, config=config, **kwargs)
-        except Exception as e:
-            print(f"⚠️ PRIMARY BRAIN (Groq) FAILED: {e}. Falling back to ANALYST (Gemini).")
-            return await self.fallback.ainvoke(input, config=config, **kwargs)
-
-    def invoke(self, input: Any, config: Any = None, **kwargs) -> Any:
-        try:
-            return self.primary.invoke(input, config=config, **kwargs)
-        except Exception as e:
-            print(f"⚠️ PRIMARY BRAIN (Groq) FAILED: {e}. Falling back to ANALYST (Gemini).")
-            return self.fallback.invoke(input, config=config, **kwargs)
-
-# Refined model instances with failover
-fast_llm = DualBrainLLM(
-    primary_model="llama-3.3-70b-versatile",
-    fallback_model="gemini-2.0-flash",
-    temperature=0.7
-)
-
-smart_llm = DualBrainLLM(
-    primary_model="llama-3.3-70b-versatile",
-    fallback_model="gemini-2.0-flash",
-    temperature=0.3
-)
+from app.core.llm import fast_llm, smart_llm
 
 # ─── HIGH-SPEED ORCHESTRATOR (WINNER'S CIRCLE SQUEEZE) ───────────────────────
 async def fast_orchestrator_node(state: AgentState) -> AgentState:

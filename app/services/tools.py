@@ -80,7 +80,10 @@ def extract_scam_data(text: str) -> Dict[str, List[str]]:
         "phone_numbers": r"(?:\+91|91|0)?(?:[\s\-]?\d){10,13}",
         # bank accounts frequently spaced, capture 9–18 digits with separators
         "bank_accounts": r"(?:\d[\s\-]?){9,22}",
-        "urls": r"https?://\S+"
+        # IFSC Codes: 4 letters + 0 + 6 alphanumeric (case insensitive logic handled by clean_text lower)
+        # But wait, clean_text is lowercased. So we must match lower case letters.
+        "ifsc_codes": r"[a-z]{4}0[a-z0-9]{6}",
+        "urls": r"(?:https?://|www\.|t\.me/)\S+"
     }
 
     results = {}

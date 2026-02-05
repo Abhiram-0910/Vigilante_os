@@ -1,16 +1,14 @@
 import os
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
-from app.core.config import SETTINGS
-
+from app.core.llm import DualBrainLLM
 
 # ────────────────────────────────────────────────────────────────────────────────
 # BRAIN 3: THE SUPERVISOR (Groq/Llama-3)
 # Switched to Groq for reliability and speed
 # ────────────────────────────────────────────────────────────────────────────────
-supervisor_llm = ChatGroq(
-    api_key=SETTINGS.GROQ_API_KEY,
-    model_name="llama-3.3-70b-versatile",
+supervisor_llm = DualBrainLLM(
+    primary_model="llama-3.3-70b-versatile",
+    fallback_model="gemini-2.0-flash",
     temperature=0.0
 )
 

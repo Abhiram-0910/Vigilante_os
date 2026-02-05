@@ -48,8 +48,29 @@ class GNNPredictor:
         # Logistic activation simulation based on edge density
         if not nodes: return 0.0
         density = len(edges) / len(nodes)
-        prob = 1 / (1 + 2.718**(-density))
-        return round(prob, 4)
+        return min(density * 0.5, 1.0)
 
-
-gnn_engine = GNNPredictor()
+def analyze_behavior_patterns(text: str) -> float:
+    """
+    Analyzes text for urgency, aggression, or manipulation patterns.
+    Returns a score between 0.0 (normal) and 1.0 (highly suspicious).
+    """
+    text_lower = text.lower()
+    score = 0.0
+    
+    # Urgency indicators
+    urgency_words = ["now", "immediate", "urgent", "expires", "today only", "hurry"]
+    if any(w in text_lower for w in urgency_words):
+        score += 0.3
+        
+    # Authority/Threat indicators
+    threat_words = ["police", "arrest", "court", "legal action", "blocked", "suspended"]
+    if any(w in text_lower for w in threat_words):
+        score += 0.4
+        
+    # Secrecy indicators
+    secrecy_words = ["don't tell", "secret", "private", "nobody else"]
+    if any(w in text_lower for w in secrecy_words):
+        score += 0.3
+        
+    return min(score, 1.0)

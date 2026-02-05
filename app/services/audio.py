@@ -14,7 +14,19 @@ except ImportError:
     save_fingerprint = lambda sid, fp: None
 
 load_dotenv()
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+# Lazy client initialization
+_client = None
+
+def get_groq_client():
+    global _client
+    if _client is None:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            # Return a dummy or raise error only when used
+            return None
+        _client = Groq(api_key=api_key)
+    return _client
 
 def validate_audio(audio_bytes: bytes) -> bool:
     if not audio_bytes: return False
@@ -62,6 +74,10 @@ def transcribe_audio(base64_string: str, session_id: str) -> Tuple[str, str, boo
                     speaker_info = "New voice profile"
         
         # Transcription
+        client = get_groq_client()
+        if not client:
+             return "[API Key Missing]", "System Error", False
+
         with open(temp_audio_path, "rb") as audio_file:
             transcription = client.audio.transcriptions.create(
                 file=(os.path.basename(temp_audio_path), audio_file.read()),
@@ -98,11 +114,5 @@ def inject_watermark(audio_path: str):
 def generate_adversarial_bait(type: str = "static") -> str:
     """
     Generates 'adversarial' audio to frustrate scammers.
-    - 'static': Simulated network interference.
-    - 'stammer': Confused elderly vocal patterns (increases cognitive load).
     """
-    baits = {
-        "static": "static_noise.mp3",
-        "stammer": "confused_stammer.mp3"
-    }
-    return baits.get(type, "static_noise.mp3")
+    return "bait.mp3"

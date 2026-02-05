@@ -43,7 +43,8 @@ class ScamStatus(str, Enum):
 class ExtractedIntel(BaseModel):
     intent_category: str = Field(default="unknown", description="Detected scam/intent type")
     upi_ids: List[str] = Field(default=[], description="Extracted UPI IDs / VPA")
-    bank_accounts: List[str] = Field(default=[], description="Extracted bank account numbers + IFSC")
+    bank_accounts: List[str] = Field(default=[], description="Extracted bank account numbers")
+    ifsc_codes: List[str] = Field(default=[], description="Extracted IFSC codes")
     phone_numbers: List[str] = Field(default=[], description="Extracted phone numbers (with country prefix if possible)")
     urls: List[str] = Field(default=[], description="Extracted URLs / phishing / payment links")
     
@@ -83,6 +84,7 @@ class AgentResponse(BaseModel):
 class JudgeExtractedIntelligence(BaseModel):
     upi_ids: List[str] = Field(default_factory=list)
     bank_accounts: List[str] = Field(default_factory=list)
+    ifsc_codes: List[str] = Field(default_factory=list)
     phone_numbers: List[str] = Field(default_factory=list)
     urls: List[str] = Field(default_factory=list)
 

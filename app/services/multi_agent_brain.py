@@ -47,22 +47,22 @@ class DynamicSwarm:
     
     def __init__(self, strong_llm: BaseLanguageModel):
         from app.core.config import SETTINGS
-        from langchain_groq import ChatGroq
+        from app.core.llm import DualBrainLLM
         
         # ACCELERATED TRAINING MODE: Use 8B model to bypass rate limits during RL state exploration
         if SETTINGS.TRAINING_MODE:
-             self.strong_llm = ChatGroq(
-                 model_name="llama-3.1-8b-instant", 
-                 temperature=0.7,
-                 api_key=SETTINGS.GROQ_API_KEY
+             self.strong_llm = DualBrainLLM(
+                 primary_model="llama-3.1-8b-instant",
+                 fallback_model="gemini-2.0-flash",
+                 temperature=0.7
              )
         else:
              self.strong_llm = strong_llm
              
-        self.fast_llm = ChatGroq(
-            model_name="llama-3.1-8b-instant", 
-            temperature=0.3,
-            api_key=SETTINGS.GROQ_API_KEY
+        self.fast_llm = DualBrainLLM(
+            primary_model="llama-3.1-8b-instant",
+            fallback_model="gemini-2.0-flash",
+            temperature=0.3
         )
 
     async def _run_single_agent(

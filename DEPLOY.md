@@ -1,36 +1,62 @@
-# Deployment (Phase 2 – No localhost/ngrok)
+# 🚀 Deployment Guide for VIBHISHAN
 
-The evaluation system will **not** accept localhost or ngrok. Deploy to a cloud host with a stable URL and SSL.
+This guide details how to deploy **VIBHISHAN** to a cloud environment (Render, Railway, or Heroku) for the National Cyber Hackathon.
 
-## Requirements
+## 📋 Prerequisites
+- GitHub Repository (public or private)
+- Account on [Render](https://render.com) or [Railway](https://railway.app)
+- API Keys:
+  - `GROQ_API_KEY` (Primary LLM)
+  - `GEMINI_API_KEY` (Fallback LLM)
+  - `VIBHISHAN_API_KEY` (Your secure access key)
 
-- **Endpoint**: `https://your-domain.com/analyze` (HTTPS, not `http://IP:8000`)
-- **Root**: `GET /` must return the professional landing page (already implemented)
-- **PORT**: Render/Railway set `PORT`; the app uses `PORT` when set (see `app/main.py`)
+## ☁️ Option 1: Deploy to Render (Recommended)
 
-## Recommended platforms
+1. **New Web Service**:
+   - Connect your GitHub repository.
+   - **Name**: `vigilante-os`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
-| Platform   | Notes |
-|-----------|--------|
-| **Render** | Add a Web Service, connect repo, build: `pip install -r requirements.txt`, start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Set env: `VIBHISHAN_API_KEY`, `GROQ_API_KEY`, `GEMINI_API_KEY`. |
-| **Railway** | Same: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Railway sets `PORT` automatically. |
-| **AWS EC2 / DigitalOcean** | Install Python, run `uvicorn app.main:app --host 0.0.0.0 --port 8000` (or use gunicorn + reverse proxy). Put Nginx/Caddy in front for SSL and use a domain. |
+2. **Environment Variables**:
+   Add the following under "Environment":
+   | Key | Value | Description |
+   | :--- | :--- | :--- |
+   | `PYTHON_VERSION` | `3.11.10` | (Or use runtime.txt) |
+   | `VIBHISHAN_API_KEY` | `gov_secure_access_2026` | Security Key |
+   | `GROQ_API_KEY` | `gsk_...` | Required for fast responses |
+   | `GEMINI_API_KEY` | `AIza...` | Required for fallback |
+   | `ENVIRONMENT` | `production` | Enables prod safeguards |
 
-## Warm-up (avoid cold start)
+3. **Verify Deployment**:
+   - Wait for the build to finish.
+   - Visit `https://<your-app>.onrender.com/health`.
+   - You should see `{"status": "ready", ...}`.
 
-If using serverless or a sleeping dyno, the first request can be slow and fail the judge.
+## 🚂 Option 2: Deploy to Railway
 
-- **Option A**: Run the warm-up script on the same host (cron or background process):
-  ```bash
-  python scripts/warmup.py https://your-app.onrender.com
-  ```
-  (Pings `/health` every 2 minutes.)
+1. **New Project** → **Deploy from GitHub repo**.
+2. Railway automatically detects `Procfile`.
+3. Go to **Variables** and add the API Keys listed above.
+4. Go to **Settings** → **Generate Domain** to get your public URL.
 
-- **Option B**: Use an external cron (e.g. cron-job.org) to GET your `/health` every 2–5 minutes.
+## 🛠️ Configuration Files
 
-## Checklist
+- **`Procfile`**: Defines the start command (`web: uvicorn ...`).
+- **`requirements.txt`**: Python dependencies.
+- **`runtime.txt`**: Python version (3.11.10).
 
-- [ ] Deploy to Render / Railway / EC2 / DO (not ngrok)
-- [ ] Use HTTPS and a real domain or platform URL
-- [ ] Set `VIBHISHAN_API_KEY` (and LLM keys) in the environment
-- [ ] Enable warm-up so the first request is fast
+## 🚨 Troubleshooting
+
+- **Timeout / Slow Responses**:
+  - Ensure `GROQ_API_KEY` is valid. The system falls back to Gemini if Groq fails, which might be slower.
+- **Memory Issues**:
+  - This app is optimized for 512MB RAM. If you see OOM kills, disable `numpy` heavy operations in `fusion.py` (not currently active).
+
+## 🛡️ Post-Deployment Check
+Run the simulation against your live URL:
+```bash
+export BASE_URL="https://your-app.onrender.com"
+python simulate_competition.py
+```

@@ -43,12 +43,12 @@ Use this to confirm the API meets judge and “NEXT PART” requirements.
 - [x] Deobfuscation (spoken digits, spaces, hyphens, “at”/“dot”)
 - [x] `verify_intelligence()` for context; deobfuscated UPIs allowed when message has payment context
 - [x] Space-collapsed UPI extraction; `validate_extracted_format()` for strict format
-- [x] Tests: `pytest tests/test_extraction_accuracy.py -v`
+- [x] Tests: `python simulate_competition.py`
 
 ## 100% Accuracy Refinements
-- [x] Detection battery: `pytest tests/test_detection_battery.py -v`
-- [x] Engagement sim: `pytest tests/test_engagement_simulation.py -v` (server)
-- [x] JSON stress: `pytest tests/test_json_schema_stress.py -v` (server)
+- [x] Detection battery: `python simulate_competition.py`
+- [x] Engagement sim: `python simulate_competition.py`
+- [x] JSON stress: `python simulate_competition.py`
 
 ## Performance
 - [x] &lt;2s target (1.2s timeout + fast path)
@@ -59,14 +59,8 @@ Use this to confirm the API meets judge and “NEXT PART” requirements.
 # Server
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-# Brutal test (auth + schema + resilience)
-python tests/brutal_test.py
-
-# Extraction accuracy
-pytest tests/test_extraction_accuracy.py -v
-
-# False positives (server must be up)
-pytest tests/test_false_positives.py -v
+# Full Competition Simulation (Detection + Extraction + Engagement)
+python simulate_competition.py
 
 # Load test
 locust -f locustfile.py --host=http://127.0.0.1:8000
