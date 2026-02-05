@@ -58,8 +58,21 @@ async def fast_orchestrator_node(state: AgentState) -> AgentState:
 
     # 2. CONSOLIDATED DELIBERATION (Planner + Profile + Agents in 1 call)
     swarm = MultiAgentSwarm(fast_llm)
-    decision = await swarm.deliberate(state)
-    
+    try:
+        decision = await swarm.deliberate(state)
+    except Exception as e:
+        print(f"SWARM FAILED: {e}. Using deterministic fallback.")
+        # Create a mock decision object to keep the pipeline alive
+        from dataclasses import dataclass
+        @dataclass
+        class MockDecision:
+            confidence: float = 1.0
+            chosen_tactic: str = "stall"
+            metadata: dict = None
+            agent_reply_draft: str = "Hmm, network slow hai... ek minute ruko."
+        
+        decision = MockDecision(metadata={"scam_type": "Suspected Scam", "threat_score": 75})
+
     profile = getattr(decision, "metadata", {})
     state["scam_type"] = profile.get("scam_type", "Unknown")
     

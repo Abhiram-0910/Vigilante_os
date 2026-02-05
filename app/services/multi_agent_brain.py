@@ -175,6 +175,8 @@ Return only JSON:
                 intel_gathered=len(state.get("extracted_data", {}).get("upi_ids", [])) / 3.0
             )
 
+            planner_chain = planner_prompt | self.strong_llm | JsonOutputParser()
+
             planner_result = await planner_chain.ainvoke({
                 "scam_type": state.get("scam_type", "unknown"),
                 "last_message": state.get("last_message", ""),
