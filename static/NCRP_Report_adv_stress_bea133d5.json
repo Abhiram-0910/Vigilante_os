@@ -1,0 +1,43 @@
+{
+    "report_header": {
+        "source_system": "VIGILANTE-OS",
+        "report_date": "2026-02-04T00:57:56.302781",
+        "case_id": "adv_stress_bea133d5",
+        "reporting_entity": "AI-powered scam baiting & intelligence system",
+        "version": "1.0"
+    },
+    "suspect_details": {
+        "digital_fingerprint": "LONG_PASSIVE_NOVOICE",
+        "suspect_phone": "Unknown",
+        "suspect_language": "Unknown",
+        "confidence_score": 0.5,
+        "emotion_pattern_last_3": [
+            "neutral"
+        ]
+    },
+    "crime_evidence": {
+        "category": "FINANCIAL_FRAUD",
+        "subcategory": "SUSPICIOUS",
+        "incident_timestamp": "2026-02-04T00:57:56.302793",
+        "extracted_identifiers": {
+            "bank_accounts": [],
+            "upi_handles": [
+                "repe@after"
+            ],
+            "phone_numbers": [],
+            "phishing_urls": []
+        },
+        "conversation_summary": {
+            "total_turns": 0,
+            "last_tactic_used": "VERIFY_IDENTITY",
+            "intelligence_collected": true
+        }
+    },
+    "ai_audit_trail": {
+        "autonomous_engagement_turns": 0,
+        "tactic_used": "VERIFY_IDENTITY",
+        "persona_used": "default",
+        "system_generated": true,
+        "confidence_fusion_score": 0.2105
+    }
+}

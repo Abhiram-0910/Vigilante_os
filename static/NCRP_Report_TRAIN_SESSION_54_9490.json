@@ -1,0 +1,41 @@
+{
+    "report_header": {
+        "source_system": "VIGILANTE-OS",
+        "report_date": "2026-02-03T23:55:56.699209",
+        "case_id": "TRAIN_SESSION_54_9490",
+        "reporting_entity": "AI-powered scam baiting & intelligence system",
+        "version": "1.0"
+    },
+    "suspect_details": {
+        "digital_fingerprint": "LONG_URGENT_NOVOICE",
+        "suspect_phone": "Unknown",
+        "suspect_language": "Unknown",
+        "confidence_score": 0.5,
+        "emotion_pattern_last_3": [
+            "desperate"
+        ]
+    },
+    "crime_evidence": {
+        "category": "FINANCIAL_FRAUD",
+        "subcategory": "SUSPICIOUS",
+        "incident_timestamp": "2026-02-03T23:55:56.699234",
+        "extracted_identifiers": {
+            "bank_accounts": [],
+            "upi_handles": [],
+            "phone_numbers": [],
+            "phishing_urls": []
+        },
+        "conversation_summary": {
+            "total_turns": 0,
+            "last_tactic_used": "safe-chat",
+            "intelligence_collected": false
+        }
+    },
+    "ai_audit_trail": {
+        "autonomous_engagement_turns": 0,
+        "tactic_used": "safe-chat",
+        "persona_used": "Unknown",
+        "system_generated": true,
+        "confidence_fusion_score": 0.3152
+    }
+}

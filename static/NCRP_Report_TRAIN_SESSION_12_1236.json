@@ -1,0 +1,47 @@
+{
+    "report_header": {
+        "source_system": "VIGILANTE-OS",
+        "report_date": "2026-02-04T15:18:49.309489",
+        "case_id": "TRAIN_SESSION_12_1236",
+        "reporting_entity": "AI-powered scam baiting & intelligence system",
+        "version": "1.0"
+    },
+    "suspect_details": {
+        "digital_fingerprint": "",
+        "suspect_phone": "Unknown",
+        "suspect_language": "Unknown",
+        "confidence_score": 0.6,
+        "emotion_pattern_last_3": []
+    },
+    "crime_evidence": {
+        "category": "FINANCIAL_FRAUD",
+        "subcategory": "LOTTERY",
+        "incident_timestamp": "2026-02-04T15:18:49.309512",
+        "extracted_identifiers": {
+            "bank_accounts": [
+                "9988776655",
+                "919876543210"
+            ],
+            "upi_handles": [
+                "9988776655@ybl [Status: VERIFIED, Risk: 0%]"
+            ],
+            "phone_numbers": [
+                "9988776655 [Bharti Airtel | Delhi]",
+                "919876543210 [Bharti Airtel | Mumbai]"
+            ],
+            "phishing_urls": []
+        },
+        "conversation_summary": {
+            "total_turns": 3,
+            "last_tactic_used": "safe-chat",
+            "intelligence_collected": true
+        }
+    },
+    "ai_audit_trail": {
+        "autonomous_engagement_turns": 3,
+        "tactic_used": "safe-chat",
+        "persona_used": "saroj",
+        "system_generated": true,
+        "confidence_fusion_score": 0.0
+    }
+}
